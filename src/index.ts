@@ -1,5 +1,7 @@
+import * as jose from 'jose';
+
 // JWT生成和验证函数
-async function generateIdToken(userInfo, clientId, nonce, env) {
+async function generateIdToken(userInfo, clientId: string, nonce: string | null | undefined, env: Env) {
   const now = Math.floor(Date.now() / 1000);
 
   const payload = {
@@ -21,7 +23,7 @@ async function generateIdToken(userInfo, clientId, nonce, env) {
   // 使用env中的私钥签名JWT
   return await new jose.SignJWT(payload)
     .setProtectedHeader({ alg: 'RS256', kid: env.JWT_KEY_ID })
-    .sign(await jose.importPKCS8(env.JWT_PRIVATE_KEY));
+    .sign(await jose.importPKCS8(env.JWT_PRIVATE_KEY, 'RS256'));
 }
 
 export default {
@@ -65,15 +67,15 @@ export default {
       feishuAuthUrl.searchParams.set('app_id', env.FEISHU_APP_ID);
       feishuAuthUrl.searchParams.set('redirect_uri', `${env.ISSUER_BASE_URL}/callback`);
       // 保存原始参数用于回调时使用
-      feishuAuthUrl.searchParams.set('state', url.searchParams.get('state'));
+      feishuAuthUrl.searchParams.set('state', url.searchParams.get('state') || '');
 
       return Response.redirect(feishuAuthUrl.toString());
     }
 
     // 处理飞书回调
     if (url.pathname === '/callback') {
-      const code = url.searchParams.get('code');
-      const state = url.searchParams.get('state');
+      const code = url.searchParams.get('code')!;
+      const state = url.searchParams.get('state')!;
 
       // 获取飞书访问令牌
       const tokenResponse = await fetch('https://open.feishu.cn/open-apis/auth/v3/app_access_token/internal', {
@@ -97,7 +99,7 @@ export default {
       const userInfo = await userInfoResponse.json();
 
       // 重定向回原始客户端，带上授权码和state
-      const redirectUrl = new URL(url.searchParams.get('redirect_uri'));
+      const redirectUrl = new URL(url.searchParams.get('redirect_uri')!);
       redirectUrl.searchParams.set('code', code);
       redirectUrl.searchParams.set('state', state);
 
@@ -108,8 +110,8 @@ export default {
     if (url.pathname === '/token' && request.method === 'POST') {
       const formData = await request.formData();
       const code = formData.get('code');
-      const clientId = formData.get('client_id');
-      const nonce = formData.get('nonce');
+      const clientId = formData.get('client_id') as string;
+      const nonce = formData.get('nonce') as string | null | undefined;
 
       // 用code换取飞书的access_token和用户信息
       // ... 与callback中相同的token和用户信息获取逻辑 ...
@@ -138,4 +140,4 @@ export default {
 
     return new Response('Not Found', { status: 404 });
   }
-};
+} satisfies ExportedHandler<Env>;
