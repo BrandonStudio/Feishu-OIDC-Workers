@@ -6,6 +6,8 @@ It allows you to integrate FeiShu's authentication system into your applications
 > \[!IMPORTANT]
 >
 > Currently, only basic identification claims (i.e. `openid email profile`) are supported.
+>
+> `offline_access` is not supported for now.
 
 ## Deployment
 
@@ -44,7 +46,18 @@ To deploy the FeiShu OIDC Adapter on Cloudflare Workers, follow these steps:
 Assume your domain is `feishu-oidc.your-domain.workers.dev`.
 
 For FeiShu Application:
+
 - **Redirect URI**: `https://feishu-oidc.your-domain.workers.dev/callback/<real-callback-url-encoded>`
+
+  For example, your real callback URL is `https://example.com/auth/callback`, then the Redirect URI should be: `https://feishu-oidc.your-domain.workers.dev/callback/https%3A%2F%2Fexample.com%2Fauth%2Fcallback`
+
+- **Required Scopes** (Perhaps a subset is enough, but I have not tested):
+  - `contact:user.base:readonly`
+  - `contact:user.id:readonly`
+  - `contact:user.employee_id:readonly`
+  - `contact:user.email:readonly`
+  - `directory:employee.base.email:read`
+  - `directory:employee.base.enterprise_email:read`
 
 For Client:
 - **Client ID**: The **App ID** of your FeiShu application.

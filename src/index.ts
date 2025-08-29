@@ -36,7 +36,7 @@ async function generateIdToken(userInfo: FeiShuUserInfo, clientId: string, nonce
   const payload: OpenIDToken = {
     // OIDC必需声明
     iss: env.ISSUER_BASE_URL,
-    sub: userInfo.user_id,
+    sub: userInfo.open_id,
     aud: clientId,
     exp: now + 3600,  // 1小时后过期
     iat: now,
@@ -265,7 +265,7 @@ export default {
       }
 
       return new Response(JSON.stringify({
-        sub: userInfoFeiShu.data.user_id,
+        sub: userInfoFeiShu.data.open_id,
         name: userInfoFeiShu.data.name,
         email: userInfoFeiShu.data.email,
       } satisfies OpenIDUserInfoSuccessResponse), {
@@ -300,7 +300,7 @@ function transformOpenIDScope(openIDScope: string): string {
     ["sub", 'contact:user.id:readonly contact:user.base:readonly contact:user.employee_id:readonly'],
     ["email", 'contact:user.email:readonly directory:employee.base.email:read directory:employee.base.enterprise_email:read'],
     ["profile", 'contact:user.base:readonly'],
-  ])
+  ]);
 
   return [
     ...new Set(
@@ -308,7 +308,7 @@ function transformOpenIDScope(openIDScope: string): string {
         .split(' ').map(scope => scopeMap.get(scope as keyof OpenIDStandardClaims) || '')
         .join(' ').split(' ')
     )
-  ].join(' ')
+  ].join(' ');
 }
 
 function truncateState(state: string): string {
