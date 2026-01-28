@@ -17,5 +17,10 @@
   },
   "dependencies": {
     "jose": "^6.0.13"
+  },
+  "pnpm": {
+    "overrides": {
+      "wrangler": ">=4.59.1"
+    }
   }
 }
