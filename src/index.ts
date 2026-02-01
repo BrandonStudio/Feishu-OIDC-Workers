@@ -268,6 +268,7 @@ export default {
         sub: userInfoFeishu.data.open_id,
         name: userInfoFeishu.data.name,
         email: userInfoFeishu.data.email,
+        preferred_username: userInfoFeishu.data.user_id,
       } satisfies OpenIDUserInfoSuccessResponse), {
         headers: response.headers,
       });
