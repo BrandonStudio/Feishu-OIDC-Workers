@@ -1,3 +1,8 @@
+/**
+ * OpenID Connect Core 1.0 types.
+ * @see https://openid.net/specs/openid-connect-core-1_0.html
+ */
+
 import type {
   OAuth2AccessTokenSuccessResponse,
   OAuth2AuthErrorResponse
@@ -302,6 +307,16 @@ type OpenIDTokenStandard = {
   azp?: string;
 };
 
+/**
+ * The primary extension that OpenID Connect makes to OAuth 2.0 to enable End-Users to be Authenticated is the ID Token data structure.
+ * The ID Token is a security token that contains
+ * Claims about the Authentication of an End-User by an Authorization Server when using a Client,
+ * and potentially other requested Claims.
+ * The ID Token is represented as a JSON Web Token (JWT).
+ * @see https://openid.net/specs/openid-connect-core-1_0.html#IDToken
+ *
+ * TODO: Add claims from https://openid.net/specs/openid-connect-core-1_0.html#CodeIDToken, https://openid.net/specs/openid-connect-core-1_0.html#HybridIDToken, and https://openid.net/specs/openid-connect-core-1_0.html#SelfIssuedResponse.
+ */
 export type OpenIDToken = OpenIDTokenStandard & Partial<OpenIDStandardClaims>;
 
 /**
@@ -510,11 +525,17 @@ export type OpenIDAuthErrorResponse = Omit<OAuth2AuthErrorResponse, 'error'> & {
     | "registration_not_supported";
 };
 
+/**
+ * @see https://openid.net/specs/openid-connect-core-1_0.html#TokenResponse
+ */
 export type OpenIDSuccessTokenResponse = OAuth2AccessTokenSuccessResponse & {
   /** ID Token value associated with the authenticated session. */
   id_token: string;
 };
 
+/**
+ * @see https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+ */
 export type OpenIDStandardClaims = {
   /**
    * Subject - Identifier for the End-User at the Issuer.
@@ -654,6 +675,9 @@ export type OpenIDStandardClaims = {
   updated_at: number;
 };
 
+/**
+ * @see https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim
+ */
 type OpenIDAddressClaim = {
   /**
    * Full mailing address, formatted for display or use on a mailing label.
@@ -677,6 +701,9 @@ type OpenIDAddressClaim = {
   country: string;
 }
 
+/**
+ * @see https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse
+ */
 export type OpenIDUserInfoSuccessResponse = {
   sub: string;
 } & Partial<OpenIDStandardClaims>;

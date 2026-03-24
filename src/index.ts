@@ -268,6 +268,8 @@ export default {
         sub: userInfoFeishu.data.open_id,
         name: userInfoFeishu.data.name,
         email: userInfoFeishu.data.email,
+        phone_number: userInfoFeishu.data.mobile || undefined,
+        preferred_username: userInfoFeishu.data.name || undefined,
       } satisfies OpenIDUserInfoSuccessResponse), {
         headers: response.headers,
       });

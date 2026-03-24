@@ -184,6 +184,9 @@ export type FeishuAccessTokenRequest = {
   scope?: string;
 };
 
+/**
+ * @see {@linkcode FeishuAccessTokenResponse}
+ */
 type FeishuAccessTokenSuccessResponse = {
   /** 错误码，为 0 时表明请求成功，非 0 表示失败 */
   code: 0;
@@ -196,6 +199,9 @@ type FeishuAccessTokenSuccessResponse = {
   scope: string;
 };
 
+/**
+ * @see {@linkcode FeishuAccessTokenResponse}
+ */
 type FeishuAccessTokenSuccessResponseWithRefreshToken = FeishuAccessTokenSuccessResponse & {
   /**
    * 用于刷新 `user_access_token`，详见[刷新 `user_access_token`](https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/authentication-management/access-token/refresh-user-access-token)。
@@ -206,6 +212,9 @@ type FeishuAccessTokenSuccessResponseWithRefreshToken = FeishuAccessTokenSuccess
   refresh_token_expires_in: number;
 };
 
+/**
+ * @see {@linkcode FeishuAccessTokenResponse}
+ */
 export type FeishuAccessTokenErrorResponse = {
   /** 错误码，为 0 时表明请求成功，非 0 表示失败 */
   code: number;
@@ -246,6 +255,9 @@ export type FeishuAccessTokenErrorResponse = {
  */
 export type FeishuAccessTokenResponse = FeishuAccessTokenSuccessResponse | FeishuAccessTokenSuccessResponseWithRefreshToken | FeishuAccessTokenErrorResponse;
 
+/**
+ * @see {@linkcode FeishuUserInfoResponse}
+ */
 export type FeishuUserInfo = {
   /** 用户姓名 */
   name: string;
