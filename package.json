@@ -6,21 +6,13 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "start": "wrangler dev",
-    "test": "vitest",
     "cf-typegen": "wrangler types"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.8.71",
-    "typescript": "^5.5.2",
-    "vitest": "~3.2.0",
-    "wrangler": "^4.59.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.76.0"
   },
   "dependencies": {
-    "jose": "^6.0.13"
-  },
-  "pnpm": {
-    "overrides": {
-      "wrangler": ">=4.59.1"
-    }
+    "jose": "^6.2.2"
   }
 }
