@@ -39,16 +39,31 @@ export const DEFAULT_PROVIDER: Provider = 'feishu';
 
 /**
  * Normalize the raw `PROVIDER` environment value into a known {@link Provider}.
- * Falls back to {@link DEFAULT_PROVIDER} for unset or unrecognized values.
+ *
+ * When `PROVIDER` is unset (undefined/null/empty) it falls back to
+ * {@link DEFAULT_PROVIDER} for backward compatibility. When it is explicitly set
+ * to an unsupported value, it throws instead of silently falling back, so a
+ * configuration typo (e.g. `larksuite` or `lrak`) surfaces immediately rather
+ * than sending users to the wrong tenant.
  */
 export function resolveProvider(value: string | undefined | null): Provider {
-  switch ((value ?? '').trim().toLowerCase()) {
+  const normalized = (value ?? '').trim().toLowerCase();
+
+  if (normalized === '') {
+    return DEFAULT_PROVIDER;
+  }
+
+  switch (normalized) {
     case 'lark':
       return 'lark';
     case 'feishu':
       return 'feishu';
     default:
-      return DEFAULT_PROVIDER;
+      throw new Error(
+        `Invalid PROVIDER value: ${JSON.stringify(value)}. ` +
+        `Supported values are "feishu" or "lark" (or leave PROVIDER unset to ` +
+        `use the default, "${DEFAULT_PROVIDER}").`,
+      );
   }
 }
 
