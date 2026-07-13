@@ -7,6 +7,13 @@ declare namespace Cloudflare {
   }
 }
 interface Env extends Cloudflare.Env {
+  /**
+   * Upstream identity provider: `feishu` (China, feishu.cn) or `lark`
+   * (international, larksuite.com). Defaults to `feishu` when unset.
+   */
+  PROVIDER?: 'feishu' | 'lark';
+  /** Optional override for the state prefix used to detect generated states. */
+  STATE_PREFIX?: string;
   DOMAIN?: string;
   ISSUER_BASE_URL: string;
   JWT_PRIVATE_KEY_PEM: string;
