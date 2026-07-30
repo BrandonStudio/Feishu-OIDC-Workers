@@ -1,12 +1,3 @@
-export const FeishuEndpoints = {
-  /** GET {@link FeishuAuthRequestParams} */
-  OAuth2Auth: 'https://accounts.feishu.cn/open-apis/authen/v1/authorize' as const,
-  /** POST {@link FeishuAccessTokenRequest}: {@link FeishuAccessTokenResponse} */
-  OAuth2Token: 'https://open.feishu.cn/open-apis/authen/v2/oauth/token' as const,
-  /** GET: {@link FeishuUserInfoResponse} */
-  UserInfo: 'https://open.feishu.cn/open-apis/authen/v1/user_info' as const,
-};
-
 /**
  * ```http
  * GET https://accounts.feishu.cn/open-apis/authen/v1/authorize HTTP/1.1

@@ -1,4 +1,10 @@
-import { FeishuEndpoints } from '@/types/feishu';
+// @ts-ignore
+import {
+  FeishuAuthRequestParams,
+  FeishuAccessTokenRequest,
+  FeishuAccessTokenResponse,
+  FeishuUserInfoResponse,
+} from './types/feishu';
 
 /**
  * Supported upstream identity providers.
@@ -14,6 +20,15 @@ import { FeishuEndpoints } from '@/types/feishu';
  * must match the console where the application was registered.
  */
 export type Provider = 'feishu' | 'lark';
+
+export const FeishuEndpoints = {
+  /** GET {@link FeishuAuthRequestParams} */
+  OAuth2Auth: 'https://accounts.feishu.cn/open-apis/authen/v1/authorize' as const,
+  /** POST {@link FeishuAccessTokenRequest}: {@link FeishuAccessTokenResponse} */
+  OAuth2Token: 'https://open.feishu.cn/open-apis/authen/v2/oauth/token' as const,
+  /** GET: {@link FeishuUserInfoResponse} */
+  UserInfo: 'https://open.feishu.cn/open-apis/authen/v1/user_info' as const,
+};
 
 /**
  * Lark (international) OAuth 2.0 endpoints.
@@ -37,21 +52,21 @@ export const ProviderEndpoints = {
 /** Provider used when `PROVIDER` is unset, keeping backward compatibility. */
 export const DEFAULT_PROVIDER: Provider = 'feishu';
 
+type AltProvider = Exclude<Provider, typeof DEFAULT_PROVIDER>;
+
+export function resolveProvider<P extends AltProvider>(value: P): AltProvider;
+export function resolveProvider<P extends typeof DEFAULT_PROVIDER>(value: P): typeof DEFAULT_PROVIDER;
+export function resolveProvider(value: undefined | null): typeof DEFAULT_PROVIDER;
+export function resolveProvider(value: string | undefined | null): Provider;
+
 /**
  * Normalize the raw `PROVIDER` environment value into a known {@link Provider}.
  *
- * When `PROVIDER` is unset (undefined/null/empty) it falls back to
- * {@link DEFAULT_PROVIDER} for backward compatibility. When it is explicitly set
- * to an unsupported value, it throws instead of silently falling back, so a
- * configuration typo (e.g. `larksuite` or `lrak`) surfaces immediately rather
- * than sending users to the wrong tenant.
+ * When `PROVIDER` is unknown or unset (undefined/null/empty) it falls back to
+ * {@link DEFAULT_PROVIDER} for backward compatibility with a warning message.
  */
-export function resolveProvider(value: string | undefined | null): Provider {
-  const normalized = (value ?? '').trim().toLowerCase();
-
-  if (normalized === '') {
-    return DEFAULT_PROVIDER;
-  }
+export function resolveProvider<P extends Provider>(value: P | string | undefined | null): Provider {
+  const normalized = value?.trim()?.toLowerCase();
 
   switch (normalized) {
     case 'lark':
@@ -59,17 +74,25 @@ export function resolveProvider(value: string | undefined | null): Provider {
     case 'feishu':
       return 'feishu';
     default:
-      throw new Error(
-        `Invalid PROVIDER value: ${JSON.stringify(value)}. ` +
-        `Supported values are "feishu" or "lark" (or leave PROVIDER unset to ` +
-        `use the default, "${DEFAULT_PROVIDER}").`,
+      console.warn(
+        `PROVIDER value unset or unknown: ${JSON.stringify(value)}. ` +
+        `Falling back to default provider "${DEFAULT_PROVIDER}".`,
       );
+      return DEFAULT_PROVIDER;
   }
 }
+
+type DefaultEndpoints = typeof ProviderEndpoints[typeof DEFAULT_PROVIDER];
+type AltEndpoints = Exclude<typeof ProviderEndpoints[keyof typeof ProviderEndpoints], DefaultEndpoints>;
+
+export function getEndpoints<P extends AltProvider>(value: P): AltEndpoints;
+export function getEndpoints<P extends typeof DEFAULT_PROVIDER>(value: P): DefaultEndpoints;
+export function getEndpoints(value: undefined | null): DefaultEndpoints;
+export function getEndpoints(value: string | undefined | null): typeof FeishuEndpoints | typeof LarkEndpoints;
 
 /**
  * Resolve the upstream endpoint set for the configured provider.
  */
-export function getEndpoints(value: string | undefined | null) {
+export function getEndpoints<P extends Provider>(value: P | string | undefined | null) {
   return ProviderEndpoints[resolveProvider(value)];
 }
