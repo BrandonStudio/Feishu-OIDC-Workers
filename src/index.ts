@@ -1,7 +1,5 @@
 import * as jose from 'jose';
-import {
-  FeishuEndpoints,
-} from '@/types/feishu';
+import { getEndpoints } from '@/endpoints';
 
 import type {
   FeishuAuthRequestParams,
@@ -58,6 +56,9 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    // Select the upstream endpoints (Feishu or Lark) based on configuration.
+    const endpoints = getEndpoints(env.PROVIDER);
+
     // OpenID Connect必需的配置端点
     if (url.pathname === '/.well-known/openid-configuration') {
       return new Response(JSON.stringify({
@@ -111,7 +112,7 @@ export default {
         // redirect_uri: inputParams.get('redirect_uri'),
       } satisfies FeishuAuthRequestParams)
 
-      const feishuAuthUrl = new URL(FeishuEndpoints.OAuth2Auth);
+      const feishuAuthUrl = new URL(endpoints.OAuth2Auth);
       feishuAuthUrl.search = '?' + searchParams.toString();
       return Response.redirect(feishuAuthUrl.toString());
     }
@@ -188,7 +189,7 @@ export default {
 
       const redirectUrl = new URL(`${env.ISSUER_BASE_URL}/callback/${encodeURIComponent(formData.get('redirect_uri')!)}`);
 
-      const feishuTokenResponse = await fetch(FeishuEndpoints.OAuth2Token, {
+      const feishuTokenResponse = await fetch(endpoints.OAuth2Token, {
         method: 'POST',
         headers: { "Content-Type": 'application/json' },
         body: JSON.stringify({
@@ -222,7 +223,7 @@ export default {
       // This is safe because no member of refresh_token will be called.
 
       // 3. 用access_token获取用户信息
-      const userInfoResponse = await fetch(FeishuEndpoints.UserInfo, {
+      const userInfoResponse = await fetch(endpoints.UserInfo, {
         headers: {
           'Authorization': `Bearer ${access_token}`,
         },
@@ -251,7 +252,7 @@ export default {
 
     // userinfo端点 - 直接转发到飞书
     if (url.pathname === '/userinfo') {
-      const response = await fetch(FeishuEndpoints.UserInfo, {
+      const response = await fetch(endpoints.UserInfo, {
         headers: request.headers,
       });
 

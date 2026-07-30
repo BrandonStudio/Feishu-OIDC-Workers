@@ -1,13 +1,32 @@
-# Feishu OIDC Adapter on Cloudflare Workers
+# Feishu / Lark OIDC Adapter on Cloudflare Workers
 
-This project provides an OpenID Connect (OIDC) adapter for Feishu (Lark) on Cloudflare Workers.
-It allows you to integrate Feishu's authentication system into your applications easily.
+This project provides an OpenID Connect (OIDC) adapter for Feishu (飞书) and Lark on Cloudflare Workers.
+It allows you to integrate Feishu's or Lark's authentication system into your applications easily.
 
 > \[!IMPORTANT]
 >
 > Currently, only basic identification claims (i.e. `openid email profile`) are supported.
 >
 > `offline_access` is not supported for now.
+
+## Provider selection (Feishu vs Lark)
+
+Feishu (飞书) and Lark are separate deployments of the same platform:
+
+| Provider | Region        | Authorize host              | API host                | Developer console          |
+| -------- | ------------- | --------------------------- | ----------------------- | -------------------------- |
+| `feishu` | China         | `accounts.feishu.cn`        | `open.feishu.cn`        | `https://open.feishu.cn/app` |
+| `lark`   | International  | `accounts.larksuite.com`    | `open.larksuite.com`    | `https://open.larksuite.com/app` |
+
+The OAuth 2.0 request/response schema is identical between the two — only the host
+differs. Select the provider with the `PROVIDER` environment variable (`feishu` or
+`lark`). When unset, it defaults to `feishu` for backward compatibility.
+
+> \[!NOTE]
+>
+> A Feishu tenant and a Lark tenant are completely isolated. An App ID / App Secret
+> created in one console is **not** valid in the other, so `PROVIDER` must match the
+> console where you registered your application.
 
 ## Deployment
 
@@ -32,6 +51,7 @@ To deploy the Feishu OIDC Adapter on Cloudflare Workers, follow these steps:
     You may find [this website](https://mkjwk.org/) useful.
 
 6.  Set up the following environment variables in your Cloudflare Worker settings:
+    - `PROVIDER`: Optional. `feishu` (default) or `lark`. Selects the upstream identity provider.
     - `ISSUER_BASE_URL`: The base URL where your Worker is deployed (e.g., `https://feishu-oidc.your-domain.workers.dev`).
     - `JWT_PRIVATE_KEY_PEM`: The private key for signing JWTs (in PEM format).
     - `JWT_PUBLIC_KEY_JWK`: The public key for verifying JWTs (in JWK format).
@@ -45,7 +65,8 @@ To deploy the Feishu OIDC Adapter on Cloudflare Workers, follow these steps:
 
 Assume your domain is `feishu-oidc.your-domain.workers.dev`.
 
-For Feishu Application:
+For your Feishu / Lark Application (register it in the console that matches your
+`PROVIDER` setting — see [Provider selection](#provider-selection-feishu-vs-lark)):
 
 - **Redirect URI**: `https://feishu-oidc.your-domain.workers.dev/callback/<real-callback-url-encoded>`
 
